@@ -58,6 +58,8 @@ public class ArticleController {
         // view 화면에 보여주기
         // addAtrb 활용하여 모델에 데이터 등록
         model.addAttribute("article", saved);
+        
+        // 깃허브 테스트
 
         return "articles/show";
     }
