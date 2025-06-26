@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.ArrayList;
+
 @Controller
 @Slf4j
 public class ArticleController {
@@ -39,17 +41,15 @@ public class ArticleController {
         Article saved = articleRepository.save(article);
         //System.out.println("3.확인용 Article save : " + saved.toString());
         log.info(saved.toString());
-        return "articles/new";
+        return "redirect:/article/"+saved.getId(); // 리다이렉트 -> redirect:주소
     }
 
     @GetMapping("/article/{number}")
     public String articleShow(@PathVariable Long number, Model model){
         //PathVariable 요청 변수 수집
-
         log.info("number : " + number);
 
         //게시글 번호 확인해서 view 처리
-
         // 받아온 아이디 값을 db로 조회
         //Optional<Article> saved = articleRepository.findById(number);
         // 조회시 없을 떄 null을 리턴 한다는 것
@@ -58,11 +58,33 @@ public class ArticleController {
         // view 화면에 보여주기
         // addAtrb 활용하여 모델에 데이터 등록
         model.addAttribute("article", saved);
-        
-        // 깃허브 테스트
 
         return "articles/show";
     }
+
+    @GetMapping("/articles")
+    public String articleAll(Model model){
+        // Down Casting
+        //List<Article> articleList = (List<Article>)articleRepository.findAll();
+        //Iterator<Article> articleList = articleRepository.findAll();
+        ArrayList<Article> articleList = articleRepository.findAll();
+
+
+        // 모델에 데이터 등록
+        model.addAttribute("articles", articleList);
+
+        return "articles/List";
+    }
+
+    @GetMapping("/img")
+    public String imageShow(Model model){
+
+        model.addAttribute("imagePath", "/Images/2222.png");
+
+        return "articles/ImageShow";
+    }
+
+
 
 
 }
