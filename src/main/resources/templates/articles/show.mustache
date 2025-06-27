@@ -15,8 +15,9 @@
         <td>{{title}}</td>
         <td>{{content}}</td>
     </tr>
-    {{/article}}
     </tbody>
 </table>
-<a href="/articles">Write List</a>
+<a href="/articles" class="btn btn-info">Write List</a>
+<a href="/article/update/{{id}}" class="btn btn-primary">Update Write</a>
+{{/article}}
 {{>layouts/footer}}
