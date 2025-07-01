@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,9 @@ public class ArticleController {
         // 로그 작성
         log.info(articleForm.toString());
         // DTO -> Entity
+        articleForm.setId(null);
         Article article = articleForm.toEntity();
+
         //System.out.println("2.확인용 Article : " + article.toString());
         log.info(articleForm.toString());
         // Repo -> DB save
@@ -106,20 +109,40 @@ public class ArticleController {
 
     // 수정 완료 버튼
     @PostMapping("/article/update/submit")
-    public String articleUpdateSubmit(ArticleForm articleForm){
-        //System.out.println("1.확인용 : " + articleForm.toString());
-        // 로그 작성
-        log.info(articleForm.toString());
+    public String articleUpdateSubmit(ArticleForm articleForm, RedirectAttributes rttr){
         // DTO -> Entity
         Article article = articleForm.toEntity();
-        //System.out.println("2.확인용 Article : " + article.toString());
+
         log.info(articleForm.toString());
         // Repo -> DB save
-        article.SetId(number);
-        Article saved = articleRepository.save(article);
-        //System.out.println("3.확인용 Article save : " + saved.toString());
-        log.info(saved.toString());
-        return "redirect:/article/"+saved.getId(); // 리다이렉트 -> redirect:주소
+
+        // 검증 로직 필요
+        Article getData = articleRepository.findById(article.getId()).orElse(null);
+
+        // 해당하는 아이디가 있을 경우에만 업데이트
+        if(getData != null){
+            Article saved = articleRepository.save(article);
+            log.info(saved.toString());
+            rttr.addFlashAttribute("msg", "업데이트가 완료되었습니다");
+        }
+
+        return "redirect:/article/"+article.getId(); // 리다이렉트 -> redirect:주소
+    }
+
+    // 게시글 삭제
+    @GetMapping("/articles/{id}/delete")
+    public String deleteArticle(@PathVariable Long id, RedirectAttributes rttr)
+    {
+        // id 에 해당하는 레코드를 가져와야함
+        Article saved = articleRepository.findById(id).orElse(null);
+        if(saved != null){
+            articleRepository.delete(saved);
+            // 한번 등록하면 나중에는 가져다가 쓴다는 의미
+            rttr.addFlashAttribute("msg", "삭제가 완료되었습니다");
+        }
+
+
+        return "redirect:/articles";
     }
 
 
