@@ -19,7 +19,7 @@ import java.util.ArrayList;
 public class ArticleController {
     // 의존성 주입
     // 의존성 주입 기능으로 오버라이딩을 생략 할 수 있다.
-    @Autowired // 의존성 주입 어노테이션 DI
+    @Autowired // 의존성 주입 어노테이션 DI(Denpendency Injection)
     private ArticleRepository articleRepository;
 
     @GetMapping("/article/new")
