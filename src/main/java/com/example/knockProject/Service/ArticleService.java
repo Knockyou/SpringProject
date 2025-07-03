@@ -6,8 +6,10 @@ import com.example.knockProject.entity.Article;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service // 서비스 객체를 생성
 @Slf4j
@@ -50,5 +52,42 @@ public class ArticleService {
             return null;
         articleRepository.delete(deleted);
         return deleted;
+    }
+
+    @Transactional // SpringFrameWork 프로세스중 예외가 발생 했을때는 디비에 저장이 되지 않는다
+    // 디비에 연결된 함수는 필수적으로 해야한다
+    // 롤백을 한다.
+    public List<Article> createArticles(List<ArticleForm> dtos) {
+        // 복수의 dto -> 복수의 entity로 변환
+
+        // for문 활용
+//        List<Article> articleList = new ArrayList<>();
+//        for(int i = 0; i < dtos.size(); i++){
+//            ArticleForm dto = dtos.get(i);
+//            Article entity = dto.toEntity();
+//            articleList.add(entity);
+//        }
+
+        // 스트림 문법으로 변경
+        // 스트림은 끊김이 없이 연결되고 연결되는것
+        List<Article> articleList = dtos.stream()
+                .map(dto -> dto.toEntity())
+                .collect(Collectors.toList()); // 나중에 toList로 묶었다는 문법
+
+
+        // 복수의 entity를 db에 저장
+//        for(int i = 0; i < articleList.size(); i++){
+//            Article article = articleList.get(i);
+//            articleRepository.save(article);
+//        }
+        // 스트림문법으로 변경
+        articleList.stream()
+                .forEach(article -> articleRepository.save(article));
+
+        // 강제로 예외상황 만들기, 롤백, @Transactional 테스트용
+        articleRepository.findById(-1L).orElseThrow(() -> new IllegalArgumentException("결제에 실패"));
+
+        // 리턴
+        return articleList;
     }
 }
