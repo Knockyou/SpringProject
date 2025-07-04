@@ -1,7 +1,9 @@
 package com.example.knockProject.controller;
 
 import com.example.knockProject.Repository.ArticleRepository;
+import com.example.knockProject.Service.CommentService;
 import com.example.knockProject.dto.ArticleForm;
+import com.example.knockProject.dto.CommentDto;
 import com.example.knockProject.entity.Article;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -21,6 +24,8 @@ public class ArticleController {
     // 의존성 주입 기능으로 오버라이딩을 생략 할 수 있다.
     @Autowired // 의존성 주입 어노테이션 DI(Denpendency Injection)
     private ArticleRepository articleRepository;
+    @Autowired
+    private CommentService commentService;
 
     @GetMapping("/article/new")
     public String newArticleForm()
@@ -57,10 +62,12 @@ public class ArticleController {
         //Optional<Article> saved = articleRepository.findById(number);
         // 조회시 없을 떄 null을 리턴 한다는 것
         Article saved = articleRepository.findById(number).orElse(null);
+        List<CommentDto> commetDtos = commentService.comments(number);
 
         // view 화면에 보여주기
         // addAtrb 활용하여 모델에 데이터 등록
         model.addAttribute("article", saved);
+        model.addAttribute("commentDtos", commetDtos);
 
         return "articles/show";
     }

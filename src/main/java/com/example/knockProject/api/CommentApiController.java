@@ -52,7 +52,7 @@ public class CommentApiController {
         CommentDto dto = commentService.deleteComment(id);
 
         // 응답
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
 }
